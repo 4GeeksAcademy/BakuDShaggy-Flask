@@ -5,8 +5,11 @@ import os
 # Get the current directory of this script
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Create Flask app with default template folder
-app = Flask(__name__)  # Remove custom template_folder
+# Correct template path - templates are in parent directory
+template_path = os.path.join(current_dir, '..', 'templates')
+
+# Create Flask app with custom template folder
+app = Flask(__name__, template_folder=template_path)
 
 # Load the model
 model_path = os.path.join(current_dir, 'iris_model.pkl')
@@ -23,14 +26,19 @@ class_dict = {
 def index():
     pred_class = None
     if request.method == 'POST':
-        val1 = float(request.form['sepal_length'])
-        val2 = float(request.form['sepal_width'])
-        val3 = float(request.form['petal_length'])
-        val4 = float(request.form['petal_width'])
-       
-        data = [[val1, val2, val3, val4]]
-        prediction = str(model.predict(data)[0])
-        pred_class = class_dict[prediction]
+        try:
+            val1 = float(request.form['sepal_length'])
+            val2 = float(request.form['sepal_width'])
+            val3 = float(request.form['petal_length'])
+            val4 = float(request.form['petal_width'])
+            
+            data = [[val1, val2, val3, val4]]
+            prediction = str(model.predict(data)[0])
+            pred_class = class_dict[prediction]
+        except Exception as e:
+            # Log error for debugging
+            app.logger.error(f"Prediction error: {str(e)}")
+            pred_class = "Error in prediction"
     
     return render_template('index.html', prediction=pred_class)
 
