@@ -1,13 +1,8 @@
-from utils import db_connect
-engine = db_connect()
 
 from flask import Flask, render_template, request
 import pickle
 import os
-
 # your code here
-
-
 
 # Get the current directory of this script
 current_dir = os.path.dirname(os.path.abspath(__file__))
